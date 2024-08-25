@@ -29,6 +29,11 @@ public:
     // Métodos adicionados
     std::unordered_set<int> transitive_closure_direct(size_t vertex_id);
     std::unordered_set<int> transitive_closure_indirect(size_t vertex_id);
+    void dfs_direct(Node* node, std::unordered_set<int>& visited);
+    void dfs_indirect(Node* node, std::unordered_set<int>& visited);
+
+    Node* find_node(size_t node_id);
+
 
 private:
     size_t _number_of_nodes;
@@ -38,12 +43,6 @@ private:
     bool   _weighted_nodes;
     Node  *_first;
     Node  *_last;
-
-    Node* find_node(size_t node_id);
-
-    // Métodos privados para DFS
-    void dfs_direct(Node* node, std::unordered_set<int>& visited);
-    void dfs_indirect(Node* node, std::unordered_set<int>& visited);
 };
 
 #endif  //GRAPH_HPP

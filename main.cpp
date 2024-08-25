@@ -100,14 +100,32 @@ int main(int argc, char* argv[]) {
                 // Implementar a função que calcula a árvore geradora mínima usando Kruskal
                 break;
             }
-            case 7: {
+           case 7: {
                 // Caminhamento em profundidade
                 size_t start_id;
                 std::cout << "Insira o ID do vertice inicial: ";
                 std::cin >> start_id;
-                // Implementar a função que realiza o caminhamento em profundidade
+
+                Node* start_node = graph.find_node(start_id);
+                if (!start_node) {
+                    std::cout << "Vértice não encontrado!\n";
+                    break;
+                }
+
+                std::unordered_set<int> visited;
+                graph.dfs_direct(start_node, visited);
+
+                // Adiciona uma mensagem de teste ao arquivo de saída
+                output_file << "Teste de escrita no arquivo.\n";
+                output_file << "subgraph cluster_dfs {\n";
+                output_file << "  label=\"DFS Caminhamento\";\n";
+                for (int id : visited) {
+                    output_file << "  " << id << ";\n";
+                }
+                output_file << "}\n";
                 break;
             }
+
             case 8: {
                 // Raio, Diâmetro, Centro e Periferia do grafo
                 // Implementar a função que calcula raio, diâmetro, centro e periferia
@@ -128,7 +146,6 @@ int main(int argc, char* argv[]) {
     } while (option != 0);
 
     graph.print_graph(output_file);
-
     output_file.close();
 
     return 0;

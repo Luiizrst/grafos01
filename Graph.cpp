@@ -10,27 +10,27 @@
 #include <vector>
 
 
-
 Graph::Graph(std::ifstream& instance)
     : _number_of_nodes(0), _number_of_edges(0), _directed(false),
       _weighted_edges(false), _weighted_nodes(false), _first(nullptr), _last(nullptr)
 {
-    int directed, weighted_edges, weighted_nodes;
-    instance >> directed >> weighted_edges >> weighted_nodes;
-    _directed = (directed == 1);
-    _weighted_edges = (weighted_edges == 1);
-    _weighted_nodes = (weighted_nodes == 1);
-
-    size_t node_id;
-    float weight;
-    while (instance >> node_id >> weight) {
-        add_node(node_id, weight);
-    }
     size_t node_id_1, node_id_2;
+    float weight;
+
     while (instance >> node_id_1 >> node_id_2 >> weight) {
+        // Adiciona nós se não existirem
+        add_node(node_id_1);
+        add_node(node_id_2);
+
+        // Adiciona aresta
         add_edge(node_id_1, node_id_2, weight);
+
+        // Mensagens de depuração
+        std::cout << "Lido do arquivo: nó " << node_id_1 << ", nó " << node_id_2 << ", peso " << weight << "\n";
     }
 }
+
+
 
 Graph::Graph()
     : _number_of_nodes(0), _number_of_edges(0), _directed(false),
@@ -145,7 +145,11 @@ void Graph::add_node(size_t node_id, float weight)
 
     _last = new_node;
     ++_number_of_nodes;
+
+    // Mensagem de depuração
+    std::cout << "Nó adicionado: " << node_id << " com peso: " << weight << "\n";
 }
+
 
 void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 {
@@ -169,7 +173,11 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
         ++node2->_number_of_edges;
     }
     ++_number_of_edges;
+
+    // Mensagem de depuração
+    std::cout << "Aresta adicionada: " << node_id_1 << " -> " << node_id_2 << " com peso: " << weight << "\n";
 }
+
 
 void Graph::print_graph(std::ofstream& output_file)
 {
@@ -187,6 +195,7 @@ void Graph::print_graph(std::ofstream& output_file)
     }
     output_file << "}\n";
 }
+
 
 void Graph::print_graph()
 {
@@ -244,16 +253,14 @@ void Graph::dfs_direct(Node* node, std::unordered_set<int>& visited)
 {
     if (visited.find(node->_id) != visited.end())
         return;
-    
+
     visited.insert(node->_id);
+
     Edge* edge = node->_first_edge;
-    while (edge)
-    {
+    while (edge) {
         Node* target_node = find_node(edge->_target_id);
         if (target_node)
-        {
             dfs_direct(target_node, visited);
-        }
         edge = edge->_next_edge;
     }
 }
@@ -264,14 +271,12 @@ void Graph::dfs_indirect(Node* node, std::unordered_set<int>& visited)
         return;
 
     visited.insert(node->_id);
+
     Edge* edge = node->_first_edge;
-    while (edge)
-    {
+    while (edge) {
         Node* target_node = find_node(edge->_target_id);
         if (target_node)
-        {
             dfs_indirect(target_node, visited);
-        }
         edge = edge->_next_edge;
     }
 }
