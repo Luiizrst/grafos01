@@ -39,7 +39,6 @@ int main(int argc, char* argv[]) {
     graph.set_directed(directed);
     graph.set_weighted_edges(weighted_edges);
     graph.set_weighted_nodes(weighted_nodes);
-
     input_file.close();
 
     std::ofstream output_file(output_file_name);
@@ -49,7 +48,6 @@ int main(int argc, char* argv[]) {
     }
 
     int option;
-
     do {
         showMenu();
         std::cin >> option;
@@ -59,7 +57,11 @@ int main(int argc, char* argv[]) {
                 size_t node_id;
                 std::cout << "Insira o ID do vertice: ";
                 std::cin >> node_id;
-                // Implementar a função que calcula o fecho transitivo direto
+                std::unordered_set<int> visited = graph.transitive_closure_direct(node_id);
+                output_file << "Fecho transitivo direto para o vértice " << node_id << ":\n";
+                for (int id : visited) {
+                    output_file << id << "\n";
+                }
                 break;
             }
             case 2: {
@@ -67,7 +69,11 @@ int main(int argc, char* argv[]) {
                 size_t node_id;
                 std::cout << "Insira o ID do vertice: ";
                 std::cin >> node_id;
-                // Implementar a função que calcula o fecho transitivo indireto
+                std::unordered_set<int> visited = graph.transitive_closure_indirect(node_id);
+                output_file << "Fecho transitivo indireto para o vértice " << node_id << ":\n";
+                for (int id : visited) {
+                    output_file << id << "\n";
+                }
                 break;
             }
             case 3: {
@@ -100,30 +106,30 @@ int main(int argc, char* argv[]) {
                 // Implementar a função que calcula a árvore geradora mínima usando Kruskal
                 break;
             }
-           case 7: {
-                // Caminhamento em profundidade
-                size_t start_id;
-                std::cout << "Insira o ID do vertice inicial: ";
-                std::cin >> start_id;
+            case 7: {
+            // Caminhamento em profundidade
+            size_t start_id;
+            std::cout << "Insira o ID do vertice inicial: ";
+            std::cin >> start_id;
 
-                Node* start_node = graph.find_node(start_id);
-                if (!start_node) {
-                    std::cout << "Vértice não encontrado!\n";
-                    break;
-                }
-
-                std::unordered_set<int> visited;
-                graph.dfs_direct(start_node, visited);
-
-                // Adiciona uma mensagem de teste ao arquivo de saída
-                output_file << "Teste de escrita no arquivo.\n";
-                output_file << "subgraph cluster_dfs {\n";
-                output_file << "  label=\"DFS Caminhamento\";\n";
-                for (int id : visited) {
-                    output_file << "  " << id << ";\n";
-                }
-                output_file << "}\n";
+            Node* start_node = graph.find_node(start_id);
+            if (!start_node) {
+                std::cout << "Vértice não encontrado!\n";
                 break;
+            }
+
+            std::unordered_set<int> visited;
+            graph.dfs_direct(start_node, visited);
+
+            // Adiciona uma mensagem de teste ao arquivo de saída
+            output_file << "Resultado do DFS começando no vértice " << start_id << ":\n";
+            output_file << "subgraph cluster_dfs {\n";
+            output_file << "  label=\"DFS Caminhamento\";\n";
+            for (int id : visited) {
+                output_file << "  " << id << ";\n";
+            }
+            output_file << "}\n";
+            break;
             }
 
             case 8: {
@@ -145,8 +151,6 @@ int main(int argc, char* argv[]) {
         }
     } while (option != 0);
 
-    graph.print_graph(output_file);
     output_file.close();
-
     return 0;
 }

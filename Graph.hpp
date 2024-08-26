@@ -5,6 +5,7 @@
 #include "defines.hpp"
 #include <unordered_set>
 #include <vector>
+#include <fstream>
 
 class Graph
 {
@@ -34,7 +35,6 @@ public:
 
     Node* find_node(size_t node_id);
 
-
 private:
     size_t _number_of_nodes;
     size_t _number_of_edges;
@@ -43,6 +43,10 @@ private:
     bool   _weighted_nodes;
     Node  *_first;
     Node  *_last;
+
+    // Métodos privados adicionados
+    void print_nodes();   // Adicione esta linha se desejar implementar a função
+    void print_edges();   // Adicione esta linha se desejar implementar a função
 };
 
-#endif  //GRAPH_HPP
+#endif  // GRAPH_HPP
