@@ -474,6 +474,111 @@ bool Graph::is_weighted_edges() const {
 
 
 // Implementação do método kruskal
+std::vector<Edge> Graph::kruskal_mst() {
+    std::vector<Edge> mst_edges;
+    std::vector<Edge> edges;
+    std::unordered_map<size_t, Node*> node_map;
+
+    // Coleta todas as arestas do grafo
+    for (Node* node = _first; node != nullptr; node = node->_next_node) {
+        Edge* edge = node->_first_edge;
+        while (edge) {
+            if (node->_id < edge->_target_id || _directed) {
+                edges.push_back(*edge);
+            }
+            edge = edge->_next_edge;
+        }
+    }
+
+    // Ordena arestas por peso
+    std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+        return a._weight < b._weight;
+    });
+
+    // Inicializa o Disjoint Set
+    DisjointSet ds(_number_of_nodes);
+
+    // Adiciona arestas ao MST usando o algoritmo de Kruskal
+    for (const Edge& edge : edges) {
+        size_t root1 = ds.find(edge._source_id);
+        size_t root2 = ds.find(edge._target_id);
+
+        if (root1 != root2) {
+            mst_edges.push_back(edge);
+            ds.union_sets(root1, root2);
+        }
+    }
+
+    return mst_edges;
+}
+
+//Raio, Diâmetro, Centro e Periferia do grafo
+std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> Graph::calculate_radius_diameter_center_periphery() {
+    // Calcular distâncias mínimas entre todos os pares de vértices usando Floyd-Warshall
+    std::unordered_map<size_t, std::unordered_map<size_t, float>> dist;
+    std::unordered_map<size_t, std::unordered_map<size_t, size_t>> next;
+
+    for (Node* u = _first; u != nullptr; u = u->_next_node) {
+        size_t u_id = u->_id;
+        dist[u_id][u_id] = 0;
+        next[u_id][u_id] = u_id;
+        
+        for (Edge* e = u->_first_edge; e != nullptr; e = e->_next_edge) {
+            dist[u_id][e->_target_id] = e->_weight;
+            next[u_id][e->_target_id] = e->_target_id;
+        }
+    }
+
+    for (Node* k = _first; k != nullptr; k = k->_next_node) {
+        size_t k_id = k->_id;
+        for (Node* i = _first; i != nullptr; i = i->_next_node) {
+            size_t i_id = i->_id;
+            for (Node* j = _first; j != nullptr; j = j->_next_node) {
+                size_t j_id = j->_id;
+                if (dist[i_id].count(k_id) && dist[k_id].count(j_id)) {
+                    float new_dist = dist[i_id][k_id] + dist[k_id][j_id];
+                    if (dist[i_id].find(j_id) == dist[i_id].end() || new_dist < dist[i_id][j_id]) {
+                        dist[i_id][j_id] = new_dist;
+                        next[i_id][j_id] = next[i_id][k_id];
+                    }
+                }
+            }
+        }
+    }
+
+    // Calcular o raio, diâmetro, centro e periferia
+    float radius = std::numeric_limits<float>::infinity();
+    float diameter = 0;
+    std::unordered_map<size_t, float> eccentricities;
+    std::unordered_set<size_t> centers;
+    std::unordered_set<size_t> peripheries;
+
+    for (Node* u = _first; u != nullptr; u = u->_next_node) {
+        size_t u_id = u->_id;
+        float eccentricity = 0;
+        for (Node* v = _first; v != nullptr; v = v->_next_node) {
+            size_t v_id = v->_id;
+            if (dist[u_id].count(v_id)) {
+                eccentricity = std::max(eccentricity, dist[u_id][v_id]);
+            }
+        }
+        eccentricities[u_id] = eccentricity;
+        radius = std::min(radius, eccentricity);
+        diameter = std::max(diameter, eccentricity);
+    }
+
+    for (const auto& [node_id, ecc] : eccentricities) {
+        if (ecc == radius) {
+            centers.insert(node_id);
+        }
+        if (ecc == diameter) {
+            peripheries.insert(node_id);
+        }
+    }
+
+    // Retornar os resultados
+    return std::make_tuple(radius, diameter, centers, peripheries);
+}
 
 
 void Graph::set_directed(bool directed) { _directed = directed; }

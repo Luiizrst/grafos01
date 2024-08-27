@@ -166,8 +166,19 @@ int main(int argc, char* argv[]) {
             }
             case 6: {
                 // Árvore Geradora Mínima usando Kruskal
-                // Implementar a função que calcula a árvore geradora mínima usando Kruskal
-                result = "Função Kruskal ainda não implementada.\n";
+                std::vector<Edge> mst_edges = graph.kruskal_mst();
+
+                // Gera a AGM no formato dot
+                result = "\nGrafo AGM KRUSKAL {\n";
+                for (const Edge& edge : mst_edges) {
+                    result += "  " + std::to_string(edge._source_id) + " -- " + std::to_string(edge._target_id);
+                    if (graph.is_weighted_edges()) {
+                        result += " [label=\"" + formatEdgeLabel(edge._weight) + "\"]";
+                    }
+                    result += ";\n";
+                }
+                result += "}\n\n";
+
                 break;
             }
             case 7: {
@@ -197,8 +208,21 @@ int main(int argc, char* argv[]) {
             }
             case 8: {
                 // Raio, Diâmetro, Centro e Periferia do grafo
-                // Implementar a função que calcula raio, diâmetro, centro e periferia
-                result = "Função para calcular raio, diâmetro, centro e periferia ainda não implementada.\n";
+                auto [radius, diameter, centers, peripheries] = graph.calculate_radius_diameter_center_periphery();
+
+                // Construir a string de resultado
+                result = "Raio do grafo: " + std::to_string(radius) + "\n";
+                result += "Diâmetro do grafo: " + std::to_string(diameter) + "\n";
+                result += "Centro(s) do grafo: ";
+                for (size_t center : centers) {
+                    result += std::to_string(center) + " ";
+                }
+                result += "\n";
+                result += "Periferia(s) do grafo: ";
+                for (size_t periphery : peripheries) {
+                    result += std::to_string(periphery) + " ";
+                }
+                result += "\n";
                 break;
             }
             case 9: {

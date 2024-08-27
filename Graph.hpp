@@ -47,7 +47,12 @@ public:
     bool is_weighted_edges() const; // Declaração correta do método
     std::vector<Edge> prim_mst(size_t start_id); // Declaração do método prim_mst
 
+    //Kruskal
+    std::vector<Edge> kruskal_mst(); // Declaração do método
 
+    //Raio, Diâmetro, Centro e Periferia do grafo
+    std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> calculate_radius_diameter_center_periphery();
+    
 private:
     size_t _number_of_nodes;
     size_t _number_of_edges;
@@ -64,5 +69,42 @@ private:
     void print_nodes();   // Adicione esta linha se desejar implementar a função
     void print_edges();   // Adicione esta linha se desejar implementar a função
 };
+
+class DisjointSet {
+public:
+    DisjointSet(size_t size) : parent(size), rank(size, 0) {
+        for (size_t i = 0; i < size; ++i) {
+            parent[i] = i;
+        }
+    }
+
+    size_t find(size_t u) {
+        if (parent[u] != u) {
+            parent[u] = find(parent[u]);
+        }
+        return parent[u];
+    }
+
+    void union_sets(size_t u, size_t v) {
+        size_t root_u = find(u);
+        size_t root_v = find(v);
+
+        if (root_u != root_v) {
+            if (rank[root_u] > rank[root_v]) {
+                parent[root_v] = root_u;
+            } else if (rank[root_u] < rank[root_v]) {
+                parent[root_u] = root_v;
+            } else {
+                parent[root_v] = root_u;
+                ++rank[root_u];
+            }
+        }
+    }
+
+private:
+    std::vector<size_t> parent;
+    std::vector<size_t> rank;
+};
+
 
 #endif  // GRAPH_HPP

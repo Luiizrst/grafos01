@@ -12,6 +12,9 @@ struct Node
     Edge  *_first_edge;
     Node  *_next_node;
     Node  *_previous_node;
+
+    
 };
+
 
 #endif  //GRAFO_BASICO_NODE_H
