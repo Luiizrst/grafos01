@@ -1,3 +1,5 @@
+// No arquivo graph.hpp
+
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
@@ -6,6 +8,9 @@
 #include <unordered_set>
 #include <vector>
 #include <fstream>
+#include <unordered_map>  // Adicionado para usar unordered_map
+#include <queue>          // Adicionado para usar priority_queue
+#include <limits>         // Adicionado para usar limites numéricos
 
 class Graph
 {
@@ -31,9 +36,17 @@ public:
     std::unordered_set<int> transitive_closure_direct(size_t vertex_id);
     std::unordered_set<int> transitive_closure_indirect(size_t vertex_id);
     void dfs_direct(Node* node, std::unordered_set<int>& visited);
-    void dfs_indirect(Node* node, std::unordered_set<int>& visited);
 
     Node* find_node(size_t node_id);
+    
+    // Adicionando a função dijkstra e floyd
+    std::vector<size_t> dijkstra(size_t start_id, size_t end_id);
+    std::vector<size_t> floyd_warshall(size_t start_id, size_t end_id);
+
+    //prim
+    bool is_weighted_edges() const; // Declaração correta do método
+    std::vector<Edge> prim_mst(size_t start_id); // Declaração do método prim_mst
+
 
 private:
     size_t _number_of_nodes;
@@ -43,6 +56,9 @@ private:
     bool   _weighted_nodes;
     Node  *_first;
     Node  *_last;
+
+    void dfs_indirect(Node* node, std::unordered_set<int>& visited);
+
 
     // Métodos privados adicionados
     void print_nodes();   // Adicione esta linha se desejar implementar a função
