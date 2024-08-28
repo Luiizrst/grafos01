@@ -300,7 +300,7 @@ std::unordered_set<int> Graph::transitivo_indireto(size_t vertex_id)
     return visited;
 }
 
-void Graph::dfs_direct(Node* node, std::unordered_set<int>& visited)
+void Graph::dfs_direcionado(Node* node, std::unordered_set<int>& visited)
 {
     if (visited.find(node->_id) != visited.end()) return;
 
@@ -308,7 +308,7 @@ void Graph::dfs_direct(Node* node, std::unordered_set<int>& visited)
     Edge* edge = node->_first_edge;
     while (edge) {
         Node* neighbor = find_node(edge->_target_id);
-        if (neighbor) dfs_direct(neighbor, visited);
+        if (neighbor) dfs_direcionado(neighbor, visited);
         edge = edge->_next_edge;
     }
 }

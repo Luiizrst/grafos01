@@ -36,7 +36,7 @@ public:
     // Métodos adicionados
     std::unordered_set<int> transitivo_direto(size_t vertex_id);
     std::unordered_set<int> transitivo_indireto(size_t vertex_id);
-    void dfs_direct(Node* node, std::unordered_set<int>& visited);
+    void dfs_direcionado(Node* node, std::unordered_set<int>& visited);
 
     Node* find_node(size_t node_id);
     

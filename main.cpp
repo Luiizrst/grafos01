@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 std::unordered_set<int> visitado;
-                graph.dfs_direct(start_node, visitado);
+                graph.dfs_direcionado(start_node, visitado);
 
                 // Adiciona uma mensagem de teste ao arquivo de saída
                 result = "\nResultado do DFS começando no vértice " + std::to_string(start_id) + ":\n";
@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
                 // Raio, Diâmetro, Centro e Periferia do grafo
                 auto [radius, diameter, centers, peripheries] = graph.calculate_radius_diameter_center_periphery();
 
-                // Construir a string de resultado
+                // Constroi a string de resultado
                 result = "\nRaio do grafo: " + std::to_string(radius) + "\n";
                 result += "Diâmetro do grafo: " + std::to_string(diameter) + "\n";
                 result += "Centro(s) do grafo: ";
