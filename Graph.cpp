@@ -393,10 +393,10 @@ std::vector<size_t> Graph::floyd_warshall(size_t start_id, size_t end_id) {
     std::unordered_map<size_t, std::unordered_map<size_t, float>> dist;
     std::unordered_map<size_t, std::unordered_map<size_t, size_t>> next;
 
-    // Inicializa as distâncias e predecessores
+    // Inicializa as distâncias e os anteriores
     for (Node* u = _first; u != nullptr; u = u->_next_node) {
         size_t u_id = u->_id;
-        dist[u_id][u_id] = 0;  // Distância de um nó para ele mesmo é 0
+        dist[u_id][u_id] = 0;  // Distância de um nó pra ele mesmo é 0
         next[u_id][u_id] = u_id;
         
         for (Edge* e = u->_first_edge; e != nullptr; e = e->_next_edge) {
@@ -405,7 +405,7 @@ std::vector<size_t> Graph::floyd_warshall(size_t start_id, size_t end_id) {
         }
     }
 
-    // Algoritmo de Floyd-Warshall
+    // Algoritmo de Floyd
     for (Node* k = _first; k != nullptr; k = k->_next_node) {
         size_t k_id = k->_id;
         for (Node* i = _first; i != nullptr; i = i->_next_node) {
@@ -440,7 +440,8 @@ std::vector<size_t> Graph::floyd_warshall(size_t start_id, size_t end_id) {
     return path;
 }
 
-std::vector<Edge> Graph::prim_mst(size_t start_id) {
+     // Árvore Geradora Mínima usando Prim
+std::vector<Edge> Graph::prim(size_t start_id) {
     std::vector<Edge> mst_edges;
     std::unordered_set<size_t> in_mst;
     auto compare = [](Edge* e1, Edge* e2) { return e1->_weight > e2->_weight; };
@@ -481,7 +482,7 @@ std::vector<Edge> Graph::prim_mst(size_t start_id) {
     return mst_edges;
 }
 
-bool Graph::is_weighted_edges() const {
+bool Graph::sao_ponderadas() const {
     return _weighted_edges;
 }
 
@@ -697,7 +698,7 @@ void Graph::saveGraphAdjacencyList(const std::string& filename) const {
                 output_file << " ";
             }
             output_file << target_id;
-            if (is_weighted_edges()) {
+            if (sao_ponderadas()) {
                 output_file << " (" << static_cast<int>(weight) << ")";
             }
             first_edge = false;

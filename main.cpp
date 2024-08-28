@@ -13,7 +13,7 @@ void showMenu() {
     std::cout << "4. Caminho minimo entre dois vertices (Floyd)\n";
     std::cout << "5. Arvore Geradora Minima (Prim)\n";
     std::cout << "6. Arvore Geradora Minima (Kruskal)\n";
-    std::cout << "7. Caminhamento em profundidade\n";
+    std::cout << "7. Busca em profundidade\n";
     std::cout << "8. Raio, Diametro, Centro e Periferia do grafo\n";
     std::cout << "9. Conjunto de vertices de articulacao\n";
     std::cout << "10. Salvar grafo na lista de adjacência\n";
@@ -147,14 +147,13 @@ int main(int argc, char* argv[]) {
                     break;
                 }
 
-                // Calcula a AGM usando Prim
-                std::vector<Edge> mst_edges = graph.prim_mst(start_id);
+                std::vector<Edge> agm_edge = graph.prim(start_id);
 
                 // Gera a AGM no formato dot
                 result = "\nGrafo AGM PRIM {\n";
-                for (const Edge& edge : mst_edges) {
+                for (const Edge& edge : agm_edge) {
                     result += "  " + std::to_string(start_id) + " -- " + std::to_string(edge._target_id);
-                    if (graph.is_weighted_edges()) {
+                    if (graph.sao_ponderadas()) {
                         result += " [label=\"" + converterEdge(edge._weight) + "\"]";
                     }
                     result += ";\n";
@@ -168,18 +167,18 @@ int main(int argc, char* argv[]) {
                 size_t n;
                 std::cout << "Insira o número de vértices no subconjunto: ";
                 std::cin >> n;
-                std::unordered_set<size_t> subset;
+                std::unordered_set<size_t> subconj; //armazena os IDs dos vertices que fazem parte do subconjunto do grafo
                 size_t vertex_id;
                 for (size_t i = 0; i < n; ++i) {
                     std::cout << "Insira o ID do vértice: ";
                     std::cin >> vertex_id;
-                    subset.insert(vertex_id);
+                    subconj.insert(vertex_id);
                 }
 
-                std::vector<Edge> mst_edges = graph.kruskal_mst(subset);
+                std::vector<Edge> agm_edge = graph.kruskal_mst(subconj);
 
                 output_file << "Árvore Geradora Mínima sobre o subgrafo vértice-induzido por X:\n";
-                for (const Edge& edge : mst_edges) {
+                for (const Edge& edge : agm_edge) {
                     output_file << "(" << edge._source_id << ", " << edge._target_id << ") peso: " << edge._weight << "\n";
                 }
                 std::cout << "\n";

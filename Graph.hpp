@@ -45,8 +45,8 @@ public:
     std::vector<size_t> floyd_warshall(size_t start_id, size_t end_id);
 
     //prim
-    bool is_weighted_edges() const; // Declaração correta do método
-    std::vector<Edge> prim_mst(size_t start_id); // Declaração do método prim_mst
+    bool sao_ponderadas() const; // Declaração correta do método
+    std::vector<Edge> prim(size_t start_id); // Declaração do método prim_mst
 
     //Kruskal
     std::vector<Edge> kruskal_mst(std::unordered_set<size_t> subset);
@@ -68,8 +68,6 @@ private:
     Node  *_first;
     Node  *_last;
 
-    //bool _weighted_edges;  // Supondo que esta variável indica se as arestas são ponderadas
-
     void dfs_indirect(Node* node, std::unordered_set<int>& visited);
 
     // Conjunto de vértices de articulação
@@ -85,8 +83,8 @@ private:
 
 
     // Métodos privados adicionados
-    void print_nodes();   // Adicione esta linha se desejar implementar a função
-    void print_edges();   // Adicione esta linha se desejar implementar a função
+    //void print_nodes();   // Adicione esta linha se desejar implementar a função
+    //void print_edges();   // Adicione esta linha se desejar implementar a função
 };
 
 
