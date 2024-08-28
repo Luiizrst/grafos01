@@ -549,37 +549,37 @@ std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>>
     }
 
     // Calcular o raio, diâmetro, centro e periferia
-    float radius = std::numeric_limits<float>::infinity();
-    float diameter = 0;
-    std::unordered_map<size_t, float> eccentricities;
-    std::unordered_set<size_t> centers;
-    std::unordered_set<size_t> peripheries;
+    float raio = std::numeric_limits<float>::infinity();
+    float diametro = 0;
+    std::unordered_map<size_t, float> excentricidades;
+    std::unordered_set<size_t> centros;
+    std::unordered_set<size_t> periferias;
 
     for (Node* u = _first; u != nullptr; u = u->_next_node) {
         size_t u_id = u->_id;
-        float eccentricity = 0;
+        float excentricidade = 0;
         for (Node* v = _first; v != nullptr; v = v->_next_node) {
             size_t v_id = v->_id;
             if (dist[u_id].count(v_id)) {
-                eccentricity = std::max(eccentricity, dist[u_id][v_id]);
+                excentricidade = std::max(excentricidade, dist[u_id][v_id]);
             }
         }
-        eccentricities[u_id] = eccentricity;
-        radius = std::min(radius, eccentricity);
-        diameter = std::max(diameter, eccentricity);
+        excentricidades[u_id] = excentricidade;
+        raio = std::min(raio, excentricidade);
+        diametro = std::max(diametro, excentricidade);
     }
 
-    for (const auto& [node_id, ecc] : eccentricities) {
-        if (ecc == radius) {
-            centers.insert(node_id);
+    for (const auto& [node_id, ecc] : excentricidades) {
+        if (ecc == raio) {
+            centros.insert(node_id);
         }
-        if (ecc == diameter) {
-            peripheries.insert(node_id);
+        if (ecc == diametro) {
+            periferias.insert(node_id);
         }
     }
 
     // Retornar os resultados
-    return std::make_tuple(radius, diameter, centers, peripheries);
+    return std::make_tuple(raio, diametro, centros, periferias);
 }
 
 //Conjunto de vertices de articulacao
