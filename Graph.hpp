@@ -6,12 +6,6 @@
 #include "Node.hpp"
 #include "defines.hpp"
 #include "Conjunto.hpp"
-#include <unordered_set>
-#include <vector>
-#include <fstream>
-#include <unordered_map>  // Adicionado para usar unordered_map
-#include <queue>          // Adicionado para usar priority_queue
-#include <limits>         // Adicionado para usar limites numéricos
 
 class Graph
 {
@@ -80,11 +74,7 @@ private:
         std::unordered_set<size_t>& articulation_points,
         std::unordered_set<size_t>& visited
     );
-
-
-    // Métodos privados adicionados
-    //void print_nodes();   // Adicione esta linha se desejar implementar a função
-    //void print_edges();   // Adicione esta linha se desejar implementar a função
+    
 };
 
 

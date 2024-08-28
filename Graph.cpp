@@ -692,7 +692,6 @@ void Graph::saveGraphAdjacencyList(const std::string& filename) const {
         output_file << "\n";
     }
 
-    std::cout << "Lista de adjacência salva com sucesso no arquivo: " << filename << std::endl;
 }
 
 
