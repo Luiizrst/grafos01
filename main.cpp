@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
                 break;
             }
             case 7: {
-                // Caminhamento em profundidade
+                // Busca em profundidade
                 size_t start_id;
                 std::cout << "Insira o ID do vertice inicial: ";
                 std::cin >> start_id;
