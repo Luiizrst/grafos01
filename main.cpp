@@ -1,9 +1,5 @@
 #include "Graph.hpp"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <unordered_set>
-#include <vector>
+#include "defines.hpp"
 
 void showMenu() {
     std::cout << "\nMenu:\n";
