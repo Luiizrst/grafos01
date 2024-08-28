@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
                 std::vector<Edge> agm_edge = graph.prim(start_id);
 
                 // Gera a AGM no formato dot
-                result = "\nGrafo AGM PRIM {\n";
+                result = "\nGraph{\n";
                 for (const Edge& edge : agm_edge) {
                     result += "  " + std::to_string(start_id) + " -- " + std::to_string(edge._target_id);
                     if (graph.sao_ponderadas()) {
