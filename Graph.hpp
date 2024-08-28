@@ -1,5 +1,3 @@
-// No arquivo graph.hpp
-
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
@@ -22,15 +20,10 @@ public:
     void print_graph();
     int connected(size_t node_id_1, size_t node_id_2);
 
-    // Métodos públicos para acessar e modificar variáveis privadas
-    void set_directed(bool directed);
-    void set_weighted_edges(bool weighted_edges);
-    void set_weighted_nodes(bool weighted_nodes);
-
     // Métodos adicionados
     std::unordered_set<int> transitivo_direto(size_t vertex_id);
     std::unordered_set<int> transitivo_indireto(size_t vertex_id);
-    void dfs_direcionado(Node* node, std::unordered_set<int>& visited);
+    void dfs_direto(Node* node, std::unordered_set<int>& visited);
 
     Node* find_node(size_t node_id);
     
@@ -38,14 +31,14 @@ public:
     std::vector<size_t> dijkstra(size_t start_id, size_t end_id);
     std::vector<size_t> floyd_warshall(size_t start_id, size_t end_id);
 
-    //prim
+    // Prim
     bool sao_ponderadas() const; // Declaração correta do método
     std::vector<Edge> prim(size_t start_id); // Declaração do método prim_mst
 
-    //Kruskal
+    // Kruskal
     std::vector<Edge> kruskal_mst(std::unordered_set<size_t> subset);
 
-    //Raio, Diâmetro, Centro e Periferia do grafo
+    // Raio, Diâmetro, Centro e Periferia do grafo
     std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> calcula_raio_diametro_center_periferia();
 
     // Conjunto de vértices de articulação
@@ -62,21 +55,20 @@ private:
     Node  *_first;
     Node  *_last;
 
-    void dfs_indirect(Node* node, std::unordered_set<int>& visited);
+    void dfs_indireto(Node* node, std::unordered_set<int>& visited);
 
     // Conjunto de vértices de articulação
     void dfs_articulacao(
         size_t node_id,
         size_t& time,
-        std::unordered_map<size_t, size_t>& discovery_time,
-        std::unordered_map<size_t, size_t>& low_time,
-        std::unordered_map<size_t, size_t>& parent,
-        std::unordered_set<size_t>& articulation_points,
-        std::unordered_set<size_t>& visited
+        std::unordered_map<size_t, size_t>& descobre_tempo,
+        std::unordered_map<size_t, size_t>& menor_tempo,
+        std::unordered_map<size_t, size_t>& pai,
+        std::unordered_set<size_t>& pontos_articulacao,
+        std::unordered_set<size_t>& visitado
     );
     
 };
-
 
 
 #endif  // GRAPH_HPP

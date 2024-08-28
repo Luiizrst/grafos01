@@ -197,7 +197,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 std::unordered_set<int> visitado;
-                graph.dfs_direcionado(start_node, visitado);
+                graph.dfs_direto(start_node, visitado);
 
                 // Adiciona uma mensagem de teste ao arquivo de saída
                 result = "\nResultado do DFS começando no vértice " + std::to_string(start_id) + ":\n";
@@ -262,7 +262,7 @@ int main(int argc, char* argv[]) {
         // Pergunta ao usuário se deseja salvar o resultado em arquivo, se a opção não for 0
         if (option != 0 && option != 10) {
             char save_option;
-            std::cout << "Deseja salvar o resultado em um arquivo? (s/n): ";
+            std::cout << "\nDeseja salvar o resultado em um arquivo? (s/n): ";
             std::cin >> save_option;
 
             if (save_option == 's' || save_option == 'S') {

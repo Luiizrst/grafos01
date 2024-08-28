@@ -18,7 +18,7 @@ Graph::Graph(std::ifstream& instance, bool directed, bool weighted_edges, bool w
         if (iss >> num_vertices) {
             // Cria os vértices
             for (size_t i = 1; i <= num_vertices; ++i) {
-                add_node(i);  // Adiciona nós com ID de 1 até num_vertices
+                add_node(i);  // Adiciona os nós com ID de 1 até num_vertices
                 std::cout << "Nó adicionado: " << i << " com peso: 0\n";
             }
         } else {
@@ -34,7 +34,7 @@ Graph::Graph(std::ifstream& instance, bool directed, bool weighted_edges, bool w
         // Verifica se a linha tem o formato esperado
         if (!(iss >> node_id_1 >> node_id_2 >> weight)) {
             std::cerr << "Formato inválido na linha: " << line << std::endl;
-            continue; // Pular para a próxima linha
+            continue; // Pula para a próxima linha
         }
 
         // Mensagem de depuração para verificar a leitura dos valores
@@ -63,17 +63,17 @@ Graph::Graph()
 
 Graph::~Graph()
 {
-    Node* current = _first;
-    while (current) {
-        Node* next = current->_next_node;
-        Edge* edge = current->_first_edge;
+    Node* atual = _first;
+    while (atual) {
+        Node* next = atual->_next_node;
+        Edge* edge = atual->_first_edge;
         while (edge) {
             Edge* next_edge = edge->_next_edge;
             delete edge;
             edge = next_edge;
         }
-        delete current;
-        current = next;
+        delete atual;
+        atual = next;
     }
 }
 
@@ -174,8 +174,6 @@ void Graph::add_node(size_t node_id, float weight)
     _last = new_node;
     ++_number_of_nodes;
 
-    // Mensagem de depuração
-    //std::cout << "Nó adicionado: " << node_id << " com peso: " << weight << "\n";
 }
 
 
@@ -207,37 +205,26 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
         ++node2->_number_of_edges;
     }
     ++_number_of_edges;
-
-    // Mensagem de depuração
-    //std::cout << "Aresta adicionada: " << node_id_1 << " -> " << node_id_2 << " com peso: " << weight << "\n";
 }
 
 
 void Graph::print_graph(std::ofstream& output_file)
 {
     output_file << "digraph G {\n";
-    Node* current = _first;
-    while (current) {
-        Edge* edge = current->_first_edge;
+    Node* atual = _first;
+    while (atual) {
+        Edge* edge = atual->_first_edge;
         while (edge) {
-            output_file << "  " << current->_id << " -> " << edge->_target_id;
+            output_file << "  " << atual->_id << " -> " << edge->_target_id;
             if (_weighted_edges) {
                 output_file << " [label=\"" << edge->_weight << "\"]";
             }
             output_file << ";\n";
             edge = edge->_next_edge;
         }
-        current = current->_next_node;
+        atual = atual->_next_node;
     }
     output_file << "}\n";
-}
-
-void Graph::print_graph()
-{
-    std::ofstream output_file("graph_output.dot");
-    print_graph(output_file);
-    output_file.close();
-    std::cout << "Graph data has been written to graph_output.dot\n";
 }
 
 int Graph::connected(size_t node_id_1, size_t node_id_2)
@@ -258,30 +245,30 @@ int Graph::connected(size_t node_id_1, size_t node_id_2)
 
 Node* Graph::find_node(size_t node_id)
 {
-    Node* current = _first;
-    while (current) {
-        if (current->_id == node_id) {
-            return current;
+    Node* atual = _first;
+    while (atual) {
+        if (atual->_id == node_id) {
+            return atual;
         }
-        current = current->_next_node;
+        atual = atual->_next_node;
     }
     return nullptr;
 }
 
 std::unordered_set<int> Graph::transitivo_direto(size_t vertex_id)
 {
-    std::unordered_set<int> direct_neighbors;
+    std::unordered_set<int> direct_vizinhos;
     Node* start_node = find_node(vertex_id);
-    if (!start_node) return direct_neighbors;
+    if (!start_node) return direct_vizinhos;
 
     // Adiciona apenas os vértices diretamente conectados
     Edge* edge = start_node->_first_edge;
     while (edge) {
-        direct_neighbors.insert(edge->_target_id);
+        direct_vizinhos.insert(edge->_target_id);
         edge = edge->_next_edge;
     }
 
-    return direct_neighbors;
+    return direct_vizinhos;
 }
 
 
@@ -292,7 +279,7 @@ std::unordered_set<int> Graph::transitivo_indireto(size_t vertex_id)
     if (!start_node) return visitado;
 
     // Inicia a DFS a partir do nó inicial
-    dfs_indirect(start_node, visitado);
+    dfs_indireto(start_node, visitado);
 
     // Remove o vértice de origem do conjunto de visitados, se estiver presente
     visitado.erase(vertex_id);
@@ -300,70 +287,70 @@ std::unordered_set<int> Graph::transitivo_indireto(size_t vertex_id)
     return visitado;
 }
 
-void Graph::dfs_direcionado(Node* node, std::unordered_set<int>& visitado)
+void Graph::dfs_direto(Node* node, std::unordered_set<int>& visitado)
 {
     if (visitado.find(node->_id) != visitado.end()) return;
 
     visitado.insert(node->_id);
     Edge* edge = node->_first_edge;
     while (edge) {
-        Node* neighbor = find_node(edge->_target_id);
-        if (neighbor) dfs_direcionado(neighbor, visitado);
+        Node* vizinho = find_node(edge->_target_id);
+        if (vizinho) dfs_direto(vizinho, visitado);
         edge = edge->_next_edge;
     }
 }
 
-void Graph::dfs_indirect(Node* node, std::unordered_set<int>& visitado)
+void Graph::dfs_indireto(Node* node, std::unordered_set<int>& visitado)
 {
     if (!node || visitado.count(node->_id)) return;
 
     visitado.insert(node->_id);
 
     for (Edge* edge = node->_first_edge; edge; edge = edge->_next_edge) {
-        Node* neighbor = find_node(edge->_target_id);
-        if (neighbor) {
-            dfs_indirect(neighbor, visitado);
+        Node* vizinho = find_node(edge->_target_id);
+        if (vizinho) {
+            dfs_indireto(vizinho, visitado);
         }
     }
 }
 
 std::vector<size_t> Graph::dijkstra(size_t start_id, size_t end_id) {
-    std::unordered_map<size_t, float> distances;
-    std::unordered_map<size_t, size_t> predecessors;
+    std::unordered_map<size_t, float> distancias;
+    std::unordered_map<size_t, size_t> anteriores;
     for (Node* node = _first; node != nullptr; node = node->_next_node) {
-        distances[node->_id] = std::numeric_limits<float>::infinity();
-        predecessors[node->_id] = -1; // Indica que não há predecessor
+        distancias[node->_id] = std::numeric_limits<float>::infinity();
+        anteriores[node->_id] = -1; // Indica que não tem anteriores
     }
-    distances[start_id] = 0;
+    distancias[start_id] = 0;
 
-    auto compare = [&distances](size_t left, size_t right) {
-        return distances[left] > distances[right];
+    auto compare = [&distancias](size_t esq, size_t dir) {
+        return distancias[esq] > distancias[dir];
     };
     std::priority_queue<size_t, std::vector<size_t>, decltype(compare)> pq(compare);
     pq.push(start_id);
 
     while (!pq.empty()) {
-        size_t current = pq.top();
+        size_t atual = pq.top();
         pq.pop();
 
-        Node* node_atual = find_node(current);
+        Node* node_atual = find_node(atual);
         if (!node_atual) continue;
 
         for (Edge* edge = node_atual->_first_edge; edge != nullptr; edge = edge->_next_edge) {
-            size_t neighbor_id = edge->_target_id;
+            size_t vizinho_id = edge->_target_id;
             float weight = edge->_weight;
-            float new_dist = distances[current] + weight;
+            float nova_dist = distancias[atual] + weight;
 
-            if (new_dist < distances[neighbor_id]) {
-                distances[neighbor_id] = new_dist;
-                predecessors[neighbor_id] = current;
-                pq.push(neighbor_id);
+            if (nova_dist < distancias[vizinho_id]) {
+                distancias[vizinho_id] = nova_dist;
+                anteriores[vizinho_id] = atual;
+                pq.push(vizinho_id);
             }
         }
     }
 
     std::vector<size_t> path;
-    for (size_t at = end_id; at != -1; at = predecessors[at]) {
+    for (size_t at = end_id; at != -1; at = anteriores[at]) {
         path.push_back(at);
     }
     std::reverse(path.begin(), path.end());
@@ -382,7 +369,7 @@ std::vector<size_t> Graph::floyd_warshall(size_t start_id, size_t end_id) {
     // Inicializa as distâncias e os anteriores
     for (Node* u = _first; u != nullptr; u = u->_next_node) {
         size_t u_id = u->_id;
-        dist[u_id][u_id] = 0;  // Distância de um nó pra ele mesmo é 0
+        dist[u_id][u_id] = 0;  // Distancia de um nó pra ele mesmo é 0
         next[u_id][u_id] = u_id;
         
         for (Edge* e = u->_first_edge; e != nullptr; e = e->_next_edge) {
@@ -399,10 +386,10 @@ std::vector<size_t> Graph::floyd_warshall(size_t start_id, size_t end_id) {
             for (Node* j = _first; j != nullptr; j = j->_next_node) {
                 size_t j_id = j->_id;
                 if (dist[i_id].count(k_id) && dist[k_id].count(j_id)) {
-                    float new_dist = dist[i_id][k_id] + dist[k_id][j_id];
+                    float nova_dist = dist[i_id][k_id] + dist[k_id][j_id];
                     auto it = dist[i_id].find(j_id);
-                    if (it == dist[i_id].end() || new_dist < it->second) {
-                        dist[i_id][j_id] = new_dist;
+                    if (it == dist[i_id].end() || nova_dist < it->second) {
+                        dist[i_id][j_id] = nova_dist;
                         next[i_id][j_id] = next[i_id][k_id];
                     }
                 }
@@ -428,13 +415,13 @@ std::vector<size_t> Graph::floyd_warshall(size_t start_id, size_t end_id) {
 
      // Árvore Geradora Mínima usando Prim
 std::vector<Edge> Graph::prim(size_t start_id) {
-    std::vector<Edge> mst_edges;
-    std::unordered_set<size_t> in_mst;
+    std::vector<Edge> agm_edges;
+    std::unordered_set<size_t> in_agm;
     auto compare = [](Edge* e1, Edge* e2) { return e1->_weight > e2->_weight; };
     std::priority_queue<Edge*, std::vector<Edge*>, decltype(compare)> pq(compare);
 
     Node* start_node = find_node(start_id);
-    if (!start_node) return mst_edges;
+    if (!start_node) return agm_edges;
 
     // Adiciona as arestas do nó inicial à fila de prioridades
     Edge* edge = start_node->_first_edge;
@@ -442,21 +429,21 @@ std::vector<Edge> Graph::prim(size_t start_id) {
         pq.push(edge);
         edge = edge->_next_edge;
     }
-    in_mst.insert(start_node->_id);
+    in_agm.insert(start_node->_id);
 
     while (!pq.empty()) {
         Edge* min_edge = pq.top();
         pq.pop();
 
-        if (in_mst.find(min_edge->_target_id) == in_mst.end()) {
-            mst_edges.push_back(*min_edge);
+        if (in_agm.find(min_edge->_target_id) == in_agm.end()) {
+            agm_edges.push_back(*min_edge);
 
             Node* next_node = find_node(min_edge->_target_id);
             if (next_node) {
-                in_mst.insert(next_node->_id);
+                in_agm.insert(next_node->_id);
                 edge = next_node->_first_edge;
                 while (edge) {
-                    if (in_mst.find(edge->_target_id) == in_mst.end()) {
+                    if (in_agm.find(edge->_target_id) == in_agm.end()) {
                         pq.push(edge);
                     }
                     edge = edge->_next_edge;
@@ -465,7 +452,7 @@ std::vector<Edge> Graph::prim(size_t start_id) {
         }
     }
 
-    return mst_edges;
+    return agm_edges;
 }
 
 bool Graph::sao_ponderadas() const {
@@ -475,7 +462,7 @@ bool Graph::sao_ponderadas() const {
 
 // Implementação do método kruskal
 std::vector<Edge> Graph::kruskal_mst(std::unordered_set<size_t> subset) {
-    std::vector<Edge> mst_edges;
+    std::vector<Edge> agm_edges;
     std::vector<Edge> edges;
 
     // Coleta as arestas que conectam os vértices do subconjunto
@@ -505,12 +492,12 @@ std::vector<Edge> Graph::kruskal_mst(std::unordered_set<size_t> subset) {
         size_t root2 = ds.find(edge._target_id);
 
         if (root1 != root2) {
-            mst_edges.push_back(edge);
+            agm_edges.push_back(edge);
             ds.union_sets(root1, root2);
         }
     }
 
-    return mst_edges;
+    return agm_edges;
 }
 
 
@@ -538,9 +525,9 @@ std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>>
             for (Node* j = _first; j != nullptr; j = j->_next_node) {
                 size_t j_id = j->_id;
                 if (dist[i_id].count(k_id) && dist[k_id].count(j_id)) {
-                    float new_dist = dist[i_id][k_id] + dist[k_id][j_id];
-                    if (dist[i_id].find(j_id) == dist[i_id].end() || new_dist < dist[i_id][j_id]) {
-                        dist[i_id][j_id] = new_dist;
+                    float nova_dist = dist[i_id][k_id] + dist[k_id][j_id];
+                    if (dist[i_id].find(j_id) == dist[i_id].end() || nova_dist < dist[i_id][j_id]) {
+                        dist[i_id][j_id] = nova_dist;
                         next[i_id][j_id] = next[i_id][k_id];
                     }
                 }
@@ -594,31 +581,31 @@ void Graph::dfs_articulacao(
 ) {
     descobre_tempo[node_id] = menor_tempo[node_id] = ++tempo;
     visitado.insert(node_id);
-    size_t children = 0;
+    size_t filho = 0;
 
     Node* node = find_node(node_id);
     if (!node) return;
 
     for (Edge* edge = node->_first_edge; edge; edge = edge->_next_edge) {
-        size_t neighbor_id = edge->_target_id;
+        size_t vizinho_id = edge->_target_id;
 
-        if (descobre_tempo.find(neighbor_id) == descobre_tempo.end()) {
+        if (descobre_tempo.find(vizinho_id) == descobre_tempo.end()) {
             // Se o vizinho não for visitado
-            pai[neighbor_id] = node_id;
-            ++children;
+            pai[vizinho_id] = node_id;
+            ++filho;
 
-            dfs_articulacao(neighbor_id, tempo, descobre_tempo, menor_tempo, pai, pontos_articulacao, visitado);
+            dfs_articulacao(vizinho_id, tempo, descobre_tempo, menor_tempo, pai, pontos_articulacao, visitado);
 
-            menor_tempo[node_id] = std::min(menor_tempo[node_id], menor_tempo[neighbor_id]);
+            menor_tempo[node_id] = std::min(menor_tempo[node_id], menor_tempo[vizinho_id]);
 
-            if (pai[node_id] == 0 && children > 1) {
+            if (pai[node_id] == 0 && filho > 1) {
                 pontos_articulacao.insert(node_id);
-            } else if (pai[node_id] != 0 && menor_tempo[neighbor_id] >= descobre_tempo[node_id]) {
+            } else if (pai[node_id] != 0 && menor_tempo[vizinho_id] >= descobre_tempo[node_id]) {
                 pontos_articulacao.insert(node_id);
             }
-        } else if (neighbor_id != pai[node_id]) {
+        } else if (vizinho_id != pai[node_id]) {
             // Atualizar valor baixo do nó
-            menor_tempo[node_id] = std::min(menor_tempo[node_id], descobre_tempo[neighbor_id]);
+            menor_tempo[node_id] = std::min(menor_tempo[node_id], descobre_tempo[vizinho_id]);
         }
     }
 }
