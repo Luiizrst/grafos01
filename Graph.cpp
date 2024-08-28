@@ -1,20 +1,6 @@
 #include "Graph.hpp"
 #include "Conjunto.hpp"
 #include "Node.hpp"
-#include <stack>
-#include <unordered_set>
-#include <algorithm>
-#include <cmath>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <utility>
-#include <vector>
-#include <queue>
-#include <limits>
-#include <map>
-#include <set>
-
 
 Graph::Graph(std::ifstream& instance, bool directed, bool weighted_edges, bool weighted_nodes)
     : _number_of_nodes(0), _number_of_edges(0), _directed(directed),

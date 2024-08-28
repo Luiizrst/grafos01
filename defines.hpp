@@ -8,5 +8,12 @@
 #include <iostream> /* implementações básicas da linguagem */
 #include <utility> /* implementações de alguns containers e operações de swap */
 #include <vector> /* implementação do container vector e suas operações */
-
+#include <sstream> /* manipulação de strings como streams, conversões de tipos e formatação */
+#include <unordered_set> /* implementação de um container de conjunto não ordenado, com operações rápidas de busca, inserção e remoção */
+#include <stack> /* implementação da estrutura de dados pilha (LIFO) */
+#include <queue> /* implementação da estrutura de dados fila (FIFO) e fila de prioridade */
+#include <limits> /* fornecimento de propriedades dos tipos numéricos, como valores máximos e mínimos */
+#include <map> /* implementação de um container de mapa associativo ordenado, que armazena pares chave-valor */
+#include <set> /* implementação de um container de conjunto ordenado, que armazena elementos únicos */
+#include <unordered_map>  /* Adicionado para usar unordered_map*/
 #endif  //DEFINES_HPP   
