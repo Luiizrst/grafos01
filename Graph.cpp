@@ -282,7 +282,7 @@ Node* Graph::find_node(size_t node_id)
     return nullptr;
 }
 
-std::unordered_set<int> Graph::transitive_closure_direct(size_t vertex_id)
+std::unordered_set<int> Graph::transitivo_direto(size_t vertex_id)
 {
     std::unordered_set<int> direct_neighbors;
     Node* start_node = find_node(vertex_id);
@@ -299,7 +299,7 @@ std::unordered_set<int> Graph::transitive_closure_direct(size_t vertex_id)
 }
 
 
-std::unordered_set<int> Graph::transitive_closure_indirect(size_t vertex_id)
+std::unordered_set<int> Graph::transitivo_indireto(size_t vertex_id)
 {
     std::unordered_set<int> visited;
     Node* start_node = find_node(vertex_id);

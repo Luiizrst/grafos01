@@ -34,8 +34,8 @@ public:
     void set_weighted_nodes(bool weighted_nodes);
 
     // Métodos adicionados
-    std::unordered_set<int> transitive_closure_direct(size_t vertex_id);
-    std::unordered_set<int> transitive_closure_indirect(size_t vertex_id);
+    std::unordered_set<int> transitivo_direto(size_t vertex_id);
+    std::unordered_set<int> transitivo_indireto(size_t vertex_id);
     void dfs_direct(Node* node, std::unordered_set<int>& visited);
 
     Node* find_node(size_t node_id);

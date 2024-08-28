@@ -21,7 +21,7 @@ void showMenu() {
     std::cout << "Escolha uma opcao:";
 }
 
-void handleOutput(bool to_file, std::ofstream& output_file, const std::string& content) {
+void sairSalvar(bool to_file, std::ofstream& output_file, const std::string& content) {
     if (to_file) {
         output_file << content;
     } else {
@@ -29,7 +29,7 @@ void handleOutput(bool to_file, std::ofstream& output_file, const std::string& c
     }
 }
 
-std::string formatEdgeLabel(float weight) {
+std::string converterEdge(float weight) {
     // Converte o peso da aresta para um inteiro e retorna como string
     int int_weight = static_cast<int>(weight);
     return std::to_string(int_weight);
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Passa todos os parâmetros para o construtor de Graph
+    // Passa os parâmetros para o construtor de Graph
     Graph graph(input_file, directed, weighted_edges, weighted_nodes);
     input_file.close();
 
@@ -76,9 +76,9 @@ int main(int argc, char* argv[]) {
                 size_t node_id;
                 std::cout << "Insira o ID do vertice: ";
                 std::cin >> node_id;
-                std::unordered_set<int> visited = graph.transitive_closure_direct(node_id);
+                std::unordered_set<int> visitado = graph.transitivo_direto(node_id);
                 result = "\nFecho transitivo direto para o vértice " + std::to_string(node_id) + ":\n";
-                for (int id : visited) {
+                for (int id : visitado) {
                     result += std::to_string(id) + "\n";
                 }
                 break;
@@ -88,9 +88,9 @@ int main(int argc, char* argv[]) {
                 size_t node_id;
                 std::cout << "Insira o ID do vertice: ";
                 std::cin >> node_id;
-                std::unordered_set<int> visited = graph.transitive_closure_indirect(node_id);
+                std::unordered_set<int> visitado = graph.transitivo_indireto(node_id);
                 result = "\nFecho transitivo indireto para o vértice " + std::to_string(node_id) + ":\n";
-                for (int id : visited) {
+                for (int id : visitado) {
                     result += std::to_string(id) + "\n";
                 }
                 break;
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
                 for (const Edge& edge : mst_edges) {
                     result += "  " + std::to_string(start_id) + " -- " + std::to_string(edge._target_id);
                     if (graph.is_weighted_edges()) {
-                        result += " [label=\"" + formatEdgeLabel(edge._weight) + "\"]";
+                        result += " [label=\"" + converterEdge(edge._weight) + "\"]";
                     }
                     result += ";\n";
                 }
@@ -197,14 +197,14 @@ int main(int argc, char* argv[]) {
                     break;
                 }
 
-                std::unordered_set<int> visited;
-                graph.dfs_direct(start_node, visited);
+                std::unordered_set<int> visitado;
+                graph.dfs_direct(start_node, visitado);
 
                 // Adiciona uma mensagem de teste ao arquivo de saída
                 result = "\nResultado do DFS começando no vértice " + std::to_string(start_id) + ":\n";
                 result += "subgraph cluster_dfs {\n";
                 result += "  label=\"DFS Caminhamento\";\n";
-                for (int id : visited) {
+                for (int id : visitado) {
                     result += "  " + std::to_string(id) + ";\n";
                 }
                 result += "}\n";
@@ -268,7 +268,7 @@ int main(int argc, char* argv[]) {
 
             if (save_option == 's' || save_option == 'S') {
                 // Salva o resultado em arquivo
-                handleOutput(true, output_file, result);
+                sairSalvar(true, output_file, result);
                 std::cout << "Resultado salvo em " << output_file_name << "\n";
             } else {
                 std::cout << "Resultado não salvo em arquivo.\n";
