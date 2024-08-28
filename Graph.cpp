@@ -346,10 +346,10 @@ std::vector<size_t> Graph::dijkstra(size_t start_id, size_t end_id) {
         size_t current = pq.top();
         pq.pop();
 
-        Node* current_node = find_node(current);
-        if (!current_node) continue;
+        Node* node_atual = find_node(current);
+        if (!node_atual) continue;
 
-        for (Edge* edge = current_node->_first_edge; edge != nullptr; edge = edge->_next_edge) {
+        for (Edge* edge = node_atual->_first_edge; edge != nullptr; edge = edge->_next_edge) {
             size_t neighbor_id = edge->_target_id;
             float weight = edge->_weight;
             float new_dist = distances[current] + weight;
@@ -643,8 +643,8 @@ std::unordered_set<size_t> Graph::find_pontos_articulacao() {
 }
 
 
-// Implementação do método saveGraphAdjacencyList
-void Graph::saveGraphAdjacencyList(const std::string& filename) const {
+// Salva o grafo em lista de Adjacencia
+void Graph::listaAdjacencia(const std::string& filename) const {
     std::ofstream output_file(filename);
     if (!output_file) {
         std::cerr << "Erro ao abrir o arquivo de saída: " << filename << "\n";
@@ -652,40 +652,40 @@ void Graph::saveGraphAdjacencyList(const std::string& filename) const {
     }
 
     // Mapa para armazenar a lista de adjacência sem duplicações
-    std::map<size_t, std::set<std::pair<size_t, float>>> adjacency_list;
+    std::map<size_t, std::set<std::pair<size_t, float>>> lista_adj;
 
-    Node* current_node = _first;
-    while (current_node != nullptr) {
-        Edge* current_edge = current_node->_first_edge;
-        while (current_edge != nullptr) {
-            // Adiciona a aresta de current_node para current_edge->_target_id
-            adjacency_list[current_node->_id].emplace(current_edge->_target_id, current_edge->_weight);
+    Node* node_atual = _first;
+    while (node_atual != nullptr) {
+        Edge* edge_atual = node_atual->_first_edge;
+        while (edge_atual != nullptr) {
+            // Adiciona a aresta de node_atual para edge_atual->_target_id
+            lista_adj[node_atual->_id].emplace(edge_atual->_target_id, edge_atual->_weight);
 
             // Se o grafo não for direcionado, verifica a aresta reversa e a remove
             if (!_directed) {
-                auto& target_set = adjacency_list[current_edge->_target_id];
-                auto reverse_edge = std::make_pair(current_node->_id, current_edge->_weight);
-                if (target_set.find(reverse_edge) != target_set.end()) {
-                    target_set.erase(reverse_edge);
+                auto& target_set = lista_adj[edge_atual->_target_id];
+                auto edge_reversa = std::make_pair(node_atual->_id, edge_atual->_weight);
+                if (target_set.find(edge_reversa) != target_set.end()) {
+                    target_set.erase(edge_reversa);
                 }
             }
 
-            current_edge = current_edge->_next_edge;
+            edge_atual = edge_atual->_next_edge;
         }
-        current_node = current_node->_next_node;
+        node_atual = node_atual->_next_node;
     }
 
     // Escreve a lista de adjacência no arquivo
-    for (const auto& [node_id, edges] : adjacency_list) {
+    for (const auto& [node_id, edges] : lista_adj) {
         output_file << node_id << ": ";
         bool first_edge = true;
-        for (const auto& [target_id, weight] : edges) {
+        for (const auto& [target_id, peso] : edges) {
             if (!first_edge) {
                 output_file << " ";
             }
             output_file << target_id;
             if (sao_ponderadas()) {
-                output_file << " (" << static_cast<int>(weight) << ")";
+                output_file << " (" << static_cast<int>(peso) << ")";
             }
             first_edge = false;
         }
@@ -696,6 +696,6 @@ void Graph::saveGraphAdjacencyList(const std::string& filename) const {
 
 
 
-void Graph::set_directed(bool directed) { _directed = directed; }
-void Graph::set_weighted_edges(bool weighted_edges) { _weighted_edges = weighted_edges; }
-void Graph::set_weighted_nodes(bool weighted_nodes) { _weighted_nodes = weighted_nodes; }
+//void Graph::set_directed(bool directed) { _directed = directed; }
+//void Graph::set_weighted_edges(bool weighted_edges) { _weighted_edges = weighted_edges; }
+//void Graph::set_weighted_nodes(bool weighted_nodes) { _weighted_nodes = weighted_nodes; }

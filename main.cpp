@@ -240,7 +240,7 @@ int main(int argc, char* argv[]) {
             }
             case 10: {
                 std::string adj_list_output = "lista_adj.txt";
-                graph.saveGraphAdjacencyList(adj_list_output);
+                graph.listaAdjacencia(adj_list_output);
                 std::cout << "Lista de adjacência salva no arquivo: " << adj_list_output << "\n";
                 break;
             }

@@ -51,7 +51,7 @@ public:
     // Conjunto de vértices de articulação
     std::unordered_set<size_t> find_pontos_articulacao();
 
-    void saveGraphAdjacencyList(const std::string& filename) const;
+    void listaAdjacencia(const std::string& filename) const;
 
 private:
     size_t _number_of_nodes;
