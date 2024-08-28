@@ -515,7 +515,7 @@ std::vector<Edge> Graph::kruskal_mst(std::unordered_set<size_t> subset) {
 
 
 //Raio, Diâmetro, Centro e Periferia do grafo
-std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> Graph::calculate_radius_diameter_center_periphery() {
+std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> Graph::calcula_raio_diametro_center_periferia() {
     // Calcular distâncias mínimas entre todos os pares de vértices usando Floyd-Warshall
     std::unordered_map<size_t, std::unordered_map<size_t, float>> dist;
     std::unordered_map<size_t, std::unordered_map<size_t, size_t>> next;
@@ -623,7 +623,7 @@ void Graph::dfs_articulation(
     }
 }
 
-std::unordered_set<size_t> Graph::find_articulation_points() {
+std::unordered_set<size_t> Graph::find_pontos_articulacao() {
     std::unordered_set<size_t> articulation_points;
     std::unordered_map<size_t, size_t> discovery_time;
     std::unordered_map<size_t, size_t> low_time;

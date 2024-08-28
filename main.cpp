@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
 
                 std::vector<Edge> agm_edge = graph.kruskal_mst(subconj);
 
-                output_file << "Árvore Geradora Mínima sobre o subgrafo vértice-induzido por X:\n";
+                output_file << "\nÁrvore Geradora Mínima sobre o subgrafo vértice-induzido por X:\n";
                 for (const Edge& edge : agm_edge) {
                     output_file << "(" << edge._source_id << ", " << edge._target_id << ") peso: " << edge._weight << "\n";
                 }
@@ -198,7 +198,7 @@ int main(int argc, char* argv[]) {
                 // Adiciona uma mensagem de teste ao arquivo de saída
                 result = "\nResultado do DFS começando no vértice " + std::to_string(start_id) + ":\n";
                 result += "subgraph cluster_dfs {\n";
-                result += "  label=\"DFS Caminhamento\";\n";
+                result += "  label=\"DFS \";\n";
                 for (int id : visitado) {
                     result += "  " + std::to_string(id) + ";\n";
                 }
@@ -207,32 +207,32 @@ int main(int argc, char* argv[]) {
             }
             case 8: {
                 // Raio, Diâmetro, Centro e Periferia do grafo
-                auto [radius, diameter, centers, peripheries] = graph.calculate_radius_diameter_center_periphery();
+                auto [raio, diametro, centro, periferias] = graph.calcula_raio_diametro_center_periferia();
 
                 // Constroi a string de resultado
-                result = "\nRaio do grafo: " + std::to_string(radius) + "\n";
-                result += "Diâmetro do grafo: " + std::to_string(diameter) + "\n";
+                result = "\nRaio do grafo: " + std::to_string(raio) + "\n";
+                result += "Diâmetro do grafo: " + std::to_string(diametro) + "\n";
                 result += "Centro(s) do grafo: ";
-                for (size_t center : centers) {
+                for (size_t center : centro) {
                     result += std::to_string(center) + " ";
                 }
                 result += "\n";
                 result += "Periferia(s) do grafo: ";
-                for (size_t periphery : peripheries) {
-                    result += std::to_string(periphery) + " ";
+                for (size_t periferia : periferias) {
+                    result += std::to_string(periferia) + " ";
                 }
                 result += "\n";
                 break;
             }
             case 9: {
                 // Conjunto de vértices de articulação
-                std::unordered_set<size_t> articulation_points = graph.find_articulation_points();
+                std::unordered_set<size_t> pontos_articulacao = graph.find_pontos_articulacao();
 
                 result = "\nConjunto de vértices de articulação:\n";
-                if (articulation_points.empty()) {
+                if (pontos_articulacao.empty()) {
                     result += "Nenhum vértice de articulação encontrado.\n";
                 } else {
-                    for (size_t id : articulation_points) {
+                    for (size_t id : pontos_articulacao) {
                         result += std::to_string(id) + "\n";
                     }
                 }

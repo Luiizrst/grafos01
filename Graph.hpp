@@ -46,10 +46,10 @@ public:
     std::vector<Edge> kruskal_mst(std::unordered_set<size_t> subset);
 
     //Raio, Diâmetro, Centro e Periferia do grafo
-    std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> calculate_radius_diameter_center_periphery();
+    std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> calcula_raio_diametro_center_periferia();
 
     // Conjunto de vértices de articulação
-    std::unordered_set<size_t> find_articulation_points();
+    std::unordered_set<size_t> find_pontos_articulacao();
 
     void saveGraphAdjacencyList(const std::string& filename) const;
 
