@@ -1,4 +1,5 @@
 #include "Graph.hpp"
+#include "Conjunto.hpp"
 #include "Node.hpp"
 #include <stack>
 #include <unordered_set>
@@ -11,11 +12,14 @@
 #include <vector>
 #include <queue>
 #include <limits>
+#include <map>
+#include <set>
 
 
-Graph::Graph(std::ifstream& instance)
-    : _number_of_nodes(0), _number_of_edges(0), _directed(false),
-      _weighted_edges(false), _weighted_nodes(false), _first(nullptr), _last(nullptr)
+Graph::Graph(std::ifstream& instance, bool directed, bool weighted_edges, bool weighted_nodes)
+    : _number_of_nodes(0), _number_of_edges(0), _directed(directed),
+      _weighted_edges(weighted_edges), _weighted_nodes(weighted_nodes),
+      _first(nullptr), _last(nullptr)
 {
     std::string line;
     size_t node_id_1, node_id_2;
@@ -53,10 +57,16 @@ Graph::Graph(std::ifstream& instance)
         // Adiciona aresta
         add_edge(node_id_1, node_id_2, weight);
 
+        // Se o grafo não for direcionado, adicione a aresta na direção oposta também
+        if (!_directed) {
+            add_edge(node_id_2, node_id_1, weight);
+        }
+
         // Mensagens de depuração
         std::cout << "Aresta adicionada: " << node_id_1 << " -> " << node_id_2 << " com peso: " << weight << "\n";
     }
 }
+
 
 
 Graph::Graph()
@@ -298,6 +308,9 @@ std::unordered_set<int> Graph::transitive_closure_indirect(size_t vertex_id)
     // Inicia a DFS a partir do nó inicial
     dfs_indirect(start_node, visited);
 
+    // Remove o vértice de origem do conjunto de visitados, se estiver presente
+    visited.erase(vertex_id);
+
     return visited;
 }
 
@@ -316,14 +329,15 @@ void Graph::dfs_direct(Node* node, std::unordered_set<int>& visited)
 
 void Graph::dfs_indirect(Node* node, std::unordered_set<int>& visited)
 {
-    if (visited.find(node->_id) != visited.end()) return;
+    if (!node || visited.count(node->_id)) return;
 
     visited.insert(node->_id);
-    Edge* edge = node->_first_edge;
-    while (edge) {
+
+    for (Edge* edge = node->_first_edge; edge; edge = edge->_next_edge) {
         Node* neighbor = find_node(edge->_target_id);
-        if (neighbor) dfs_indirect(neighbor, visited);
-        edge = edge->_next_edge;
+        if (neighbor) {
+            dfs_indirect(neighbor, visited);
+        }
     }
 }
 
@@ -472,25 +486,25 @@ bool Graph::is_weighted_edges() const {
 }
 
 
-
 // Implementação do método kruskal
-std::vector<Edge> Graph::kruskal_mst() {
+std::vector<Edge> Graph::kruskal_mst(std::unordered_set<size_t> subset) {
     std::vector<Edge> mst_edges;
     std::vector<Edge> edges;
-    std::unordered_map<size_t, Node*> node_map;
 
-    // Coleta todas as arestas do grafo
+    // Coleta as arestas que conectam os vértices do subconjunto
     for (Node* node = _first; node != nullptr; node = node->_next_node) {
-        Edge* edge = node->_first_edge;
-        while (edge) {
-            if (node->_id < edge->_target_id || _directed) {
-                edges.push_back(*edge);
+        if (subset.find(node->_id) != subset.end()) {
+            Edge* edge = node->_first_edge;
+            while (edge) {
+                if (subset.find(edge->_target_id) != subset.end()) {
+                    edges.push_back(*edge);
+                }
+                edge = edge->_next_edge;
             }
-            edge = edge->_next_edge;
         }
     }
 
-    // Ordena arestas por peso
+    // Ordena as arestas por peso
     std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
         return a._weight < b._weight;
     });
@@ -511,6 +525,7 @@ std::vector<Edge> Graph::kruskal_mst() {
 
     return mst_edges;
 }
+
 
 //Raio, Diâmetro, Centro e Periferia do grafo
 std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> Graph::calculate_radius_diameter_center_periphery() {
@@ -579,6 +594,120 @@ std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>>
     // Retornar os resultados
     return std::make_tuple(radius, diameter, centers, peripheries);
 }
+
+//Conjunto de vertices de articulacao
+void Graph::dfs_articulation(
+    size_t node_id,
+    size_t& time,
+    std::unordered_map<size_t, size_t>& discovery_time,
+    std::unordered_map<size_t, size_t>& low_time,
+    std::unordered_map<size_t, size_t>& parent,
+    std::unordered_set<size_t>& articulation_points,
+    std::unordered_set<size_t>& visited
+) {
+    discovery_time[node_id] = low_time[node_id] = ++time;
+    visited.insert(node_id);
+    size_t children = 0;
+
+    Node* node = find_node(node_id);
+    if (!node) return;
+
+    for (Edge* edge = node->_first_edge; edge; edge = edge->_next_edge) {
+        size_t neighbor_id = edge->_target_id;
+
+        if (discovery_time.find(neighbor_id) == discovery_time.end()) {
+            // If neighbor is not visited
+            parent[neighbor_id] = node_id;
+            ++children;
+
+            dfs_articulation(neighbor_id, time, discovery_time, low_time, parent, articulation_points, visited);
+
+            low_time[node_id] = std::min(low_time[node_id], low_time[neighbor_id]);
+
+            if (parent[node_id] == 0 && children > 1) {
+                articulation_points.insert(node_id);
+            } else if (parent[node_id] != 0 && low_time[neighbor_id] >= discovery_time[node_id]) {
+                articulation_points.insert(node_id);
+            }
+        } else if (neighbor_id != parent[node_id]) {
+            // Update low value of node
+            low_time[node_id] = std::min(low_time[node_id], discovery_time[neighbor_id]);
+        }
+    }
+}
+
+std::unordered_set<size_t> Graph::find_articulation_points() {
+    std::unordered_set<size_t> articulation_points;
+    std::unordered_map<size_t, size_t> discovery_time;
+    std::unordered_map<size_t, size_t> low_time;
+    std::unordered_map<size_t, size_t> parent;
+    std::unordered_set<size_t> visited;
+    size_t time = 0;
+
+    Node* node = _first;
+    while (node) {
+        if (discovery_time.find(node->_id) == discovery_time.end()) {
+            dfs_articulation(node->_id, time, discovery_time, low_time, parent, articulation_points, visited);
+        }
+        node = node->_next_node;
+    }
+
+    return articulation_points;
+}
+
+
+// Implementação do método saveGraphAdjacencyList
+void Graph::saveGraphAdjacencyList(const std::string& filename) const {
+    std::ofstream output_file(filename);
+    if (!output_file) {
+        std::cerr << "Erro ao abrir o arquivo de saída: " << filename << "\n";
+        return;
+    }
+
+    // Mapa para armazenar a lista de adjacência sem duplicações
+    std::map<size_t, std::set<std::pair<size_t, float>>> adjacency_list;
+
+    Node* current_node = _first;
+    while (current_node != nullptr) {
+        Edge* current_edge = current_node->_first_edge;
+        while (current_edge != nullptr) {
+            // Adiciona a aresta de current_node para current_edge->_target_id
+            adjacency_list[current_node->_id].emplace(current_edge->_target_id, current_edge->_weight);
+
+            // Se o grafo não for direcionado, verifica a aresta reversa e a remove
+            if (!_directed) {
+                auto& target_set = adjacency_list[current_edge->_target_id];
+                auto reverse_edge = std::make_pair(current_node->_id, current_edge->_weight);
+                if (target_set.find(reverse_edge) != target_set.end()) {
+                    target_set.erase(reverse_edge);
+                }
+            }
+
+            current_edge = current_edge->_next_edge;
+        }
+        current_node = current_node->_next_node;
+    }
+
+    // Escreve a lista de adjacência no arquivo
+    for (const auto& [node_id, edges] : adjacency_list) {
+        output_file << node_id << ": ";
+        bool first_edge = true;
+        for (const auto& [target_id, weight] : edges) {
+            if (!first_edge) {
+                output_file << " ";
+            }
+            output_file << target_id;
+            if (is_weighted_edges()) {
+                output_file << " (" << static_cast<int>(weight) << ")";
+            }
+            first_edge = false;
+        }
+        output_file << "\n";
+    }
+
+    std::cout << "Lista de adjacência salva com sucesso no arquivo: " << filename << std::endl;
+}
+
 
 
 void Graph::set_directed(bool directed) { _directed = directed; }

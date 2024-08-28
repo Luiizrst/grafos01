@@ -6,7 +6,7 @@
 #include <vector>
 
 void showMenu() {
-    std::cout << "Escolha uma opcao:\n";
+    std::cout << "\nMenu:\n";
     std::cout << "1. Fecho transitivo direto de um vertice\n";
     std::cout << "2. Fecho transitivo indireto de um vertice\n";
     std::cout << "3. Caminho minimo entre dois vertices (Dijkstra)\n";
@@ -16,8 +16,9 @@ void showMenu() {
     std::cout << "7. Caminhamento em profundidade\n";
     std::cout << "8. Raio, Diametro, Centro e Periferia do grafo\n";
     std::cout << "9. Conjunto de vertices de articulacao\n";
+    std::cout << "10. Salvar grafo na lista de adjacência\n";
     std::cout << "0. Sair\n";
-    std::cout << "Escolha: ";
+    std::cout << "Escolha uma opcao:";
 }
 
 void handleOutput(bool to_file, std::ofstream& output_file, const std::string& content) {
@@ -52,15 +53,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    Graph graph(input_file);
-    graph.set_directed(directed);
-    graph.set_weighted_edges(weighted_edges);
-    graph.set_weighted_nodes(weighted_nodes);
+    // Passa todos os parâmetros para o construtor de Graph
+    Graph graph(input_file, directed, weighted_edges, weighted_nodes);
     input_file.close();
 
     std::ofstream output_file(output_file_name);
     if (!output_file) {
-        std::cerr << "Erro ao abrir o arquivo de saida: " << output_file_name << "\n";
+        std::cerr << "Erro ao abrir o arquivo de saída: " << output_file_name << "\n";
         return 1;
     }
 
@@ -78,7 +77,7 @@ int main(int argc, char* argv[]) {
                 std::cout << "Insira o ID do vertice: ";
                 std::cin >> node_id;
                 std::unordered_set<int> visited = graph.transitive_closure_direct(node_id);
-                result = "Fecho transitivo direto para o vértice " + std::to_string(node_id) + ":\n";
+                result = "\nFecho transitivo direto para o vértice " + std::to_string(node_id) + ":\n";
                 for (int id : visited) {
                     result += std::to_string(id) + "\n";
                 }
@@ -90,7 +89,7 @@ int main(int argc, char* argv[]) {
                 std::cout << "Insira o ID do vertice: ";
                 std::cin >> node_id;
                 std::unordered_set<int> visited = graph.transitive_closure_indirect(node_id);
-                result = "Fecho transitivo indireto para o vértice " + std::to_string(node_id) + ":\n";
+                result = "\nFecho transitivo indireto para o vértice " + std::to_string(node_id) + ":\n";
                 for (int id : visited) {
                     result += std::to_string(id) + "\n";
                 }
@@ -108,7 +107,7 @@ int main(int argc, char* argv[]) {
                 if (path.empty()) {
                     result = "Não há caminho entre " + std::to_string(start_id) + " e " + std::to_string(end_id) + ".\n";
                 } else {
-                    result = "Caminho mínimo de " + std::to_string(start_id) + " até " + std::to_string(end_id) + ":\n";
+                    result = "\nCaminho mínimo de " + std::to_string(start_id) + " até " + std::to_string(end_id) + ":\n";
                     for (size_t id : path) {
                         result += std::to_string(id) + " ";
                     }
@@ -128,7 +127,7 @@ int main(int argc, char* argv[]) {
                 if (path.empty()) {
                     result = "Não há caminho entre " + std::to_string(start_id) + " e " + std::to_string(end_id) + ".\n";
                 } else {
-                    result = "Caminho mínimo de " + std::to_string(start_id) + " até " + std::to_string(end_id) + ":\n";
+                    result = "\nCaminho mínimo de " + std::to_string(start_id) + " até " + std::to_string(end_id) + ":\n";
                     for (size_t id : path) {
                         result += std::to_string(id) + " ";
                     }
@@ -166,19 +165,24 @@ int main(int argc, char* argv[]) {
             }
             case 6: {
                 // Árvore Geradora Mínima usando Kruskal
-                std::vector<Edge> mst_edges = graph.kruskal_mst();
-
-                // Gera a AGM no formato dot
-                result = "\nGrafo AGM KRUSKAL {\n";
-                for (const Edge& edge : mst_edges) {
-                    result += "  " + std::to_string(edge._source_id) + " -- " + std::to_string(edge._target_id);
-                    if (graph.is_weighted_edges()) {
-                        result += " [label=\"" + formatEdgeLabel(edge._weight) + "\"]";
-                    }
-                    result += ";\n";
+                size_t n;
+                std::cout << "Insira o número de vértices no subconjunto: ";
+                std::cin >> n;
+                std::unordered_set<size_t> subset;
+                size_t vertex_id;
+                for (size_t i = 0; i < n; ++i) {
+                    std::cout << "Insira o ID do vértice: ";
+                    std::cin >> vertex_id;
+                    subset.insert(vertex_id);
                 }
-                result += "}\n\n";
 
+                std::vector<Edge> mst_edges = graph.kruskal_mst(subset);
+
+                output_file << "Árvore Geradora Mínima sobre o subgrafo vértice-induzido por X:\n";
+                for (const Edge& edge : mst_edges) {
+                    output_file << "(" << edge._source_id << ", " << edge._target_id << ") peso: " << edge._weight << "\n";
+                }
+                std::cout << "\n";
                 break;
             }
             case 7: {
@@ -186,7 +190,7 @@ int main(int argc, char* argv[]) {
                 size_t start_id;
                 std::cout << "Insira o ID do vertice inicial: ";
                 std::cin >> start_id;
-
+    
                 Node* start_node = graph.find_node(start_id);
                 if (!start_node) {
                     result = "Vértice não encontrado!\n";
@@ -197,7 +201,7 @@ int main(int argc, char* argv[]) {
                 graph.dfs_direct(start_node, visited);
 
                 // Adiciona uma mensagem de teste ao arquivo de saída
-                result = "Resultado do DFS começando no vértice " + std::to_string(start_id) + ":\n";
+                result = "\nResultado do DFS começando no vértice " + std::to_string(start_id) + ":\n";
                 result += "subgraph cluster_dfs {\n";
                 result += "  label=\"DFS Caminhamento\";\n";
                 for (int id : visited) {
@@ -211,7 +215,7 @@ int main(int argc, char* argv[]) {
                 auto [radius, diameter, centers, peripheries] = graph.calculate_radius_diameter_center_periphery();
 
                 // Construir a string de resultado
-                result = "Raio do grafo: " + std::to_string(radius) + "\n";
+                result = "\nRaio do grafo: " + std::to_string(radius) + "\n";
                 result += "Diâmetro do grafo: " + std::to_string(diameter) + "\n";
                 result += "Centro(s) do grafo: ";
                 for (size_t center : centers) {
@@ -227,8 +231,22 @@ int main(int argc, char* argv[]) {
             }
             case 9: {
                 // Conjunto de vértices de articulação
-                // Implementar a função que encontra o conjunto de vértices de articulação
-                result = "Função para encontrar vértices de articulação ainda não implementada.\n";
+                std::unordered_set<size_t> articulation_points = graph.find_articulation_points();
+
+                result = "\nConjunto de vértices de articulação:\n";
+                if (articulation_points.empty()) {
+                    result += "Nenhum vértice de articulação encontrado.\n";
+                } else {
+                    for (size_t id : articulation_points) {
+                        result += std::to_string(id) + "\n";
+                    }
+                }
+                break;
+            }
+            case 10: {
+                std::string adj_list_output = "lista_adj.txt";
+                graph.saveGraphAdjacencyList(adj_list_output);
+                std::cout << "Lista de adjacência salva no arquivo: " << adj_list_output << "\n";
                 break;
             }
             case 0:
@@ -239,12 +257,22 @@ int main(int argc, char* argv[]) {
                 break;
         }
 
-        if (option != 0) {
-            char save_choice;
-            std::cout << "Deseja salvar a saída em arquivo (s/n)? ";
-            std::cin >> save_choice;
-            bool save_to_file = (save_choice == 's' || save_choice == 'S');
-            handleOutput(save_to_file, output_file, result);
+        // Sempre imprime o resultado na tela
+        std::cout << result;
+
+        // Pergunta ao usuário se deseja salvar o resultado em arquivo, se a opção não for 0
+        if (option != 0 && option != 10) {
+            char save_option;
+            std::cout << "Deseja salvar o resultado em um arquivo? (s/n): ";
+            std::cin >> save_option;
+
+            if (save_option == 's' || save_option == 'S') {
+                // Salva o resultado em arquivo
+                handleOutput(true, output_file, result);
+                std::cout << "Resultado salvo em " << output_file_name << "\n";
+            } else {
+                std::cout << "Resultado não salvo em arquivo.\n";
+            }
         }
 
     } while (option != 0);

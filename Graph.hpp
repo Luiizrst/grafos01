@@ -5,6 +5,7 @@
 
 #include "Node.hpp"
 #include "defines.hpp"
+#include "Conjunto.hpp"
 #include <unordered_set>
 #include <vector>
 #include <fstream>
@@ -15,7 +16,7 @@
 class Graph
 {
 public:
-    Graph(std::ifstream& instance);
+    Graph(std::ifstream& instance, bool directed, bool weighted_edges, bool weighted_nodes);    
     Graph();
     ~Graph();
 
@@ -48,11 +49,16 @@ public:
     std::vector<Edge> prim_mst(size_t start_id); // Declaração do método prim_mst
 
     //Kruskal
-    std::vector<Edge> kruskal_mst(); // Declaração do método
+    std::vector<Edge> kruskal_mst(std::unordered_set<size_t> subset);
 
     //Raio, Diâmetro, Centro e Periferia do grafo
     std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> calculate_radius_diameter_center_periphery();
-    
+
+    // Conjunto de vértices de articulação
+    std::unordered_set<size_t> find_articulation_points();
+
+    void saveGraphAdjacencyList(const std::string& filename) const;
+
 private:
     size_t _number_of_nodes;
     size_t _number_of_edges;
@@ -62,7 +68,20 @@ private:
     Node  *_first;
     Node  *_last;
 
+    //bool _weighted_edges;  // Supondo que esta variável indica se as arestas são ponderadas
+
     void dfs_indirect(Node* node, std::unordered_set<int>& visited);
+
+    // Conjunto de vértices de articulação
+    void dfs_articulation(
+        size_t node_id,
+        size_t& time,
+        std::unordered_map<size_t, size_t>& discovery_time,
+        std::unordered_map<size_t, size_t>& low_time,
+        std::unordered_map<size_t, size_t>& parent,
+        std::unordered_set<size_t>& articulation_points,
+        std::unordered_set<size_t>& visited
+    );
 
 
     // Métodos privados adicionados
@@ -70,41 +89,6 @@ private:
     void print_edges();   // Adicione esta linha se desejar implementar a função
 };
 
-class DisjointSet {
-public:
-    DisjointSet(size_t size) : parent(size), rank(size, 0) {
-        for (size_t i = 0; i < size; ++i) {
-            parent[i] = i;
-        }
-    }
-
-    size_t find(size_t u) {
-        if (parent[u] != u) {
-            parent[u] = find(parent[u]);
-        }
-        return parent[u];
-    }
-
-    void union_sets(size_t u, size_t v) {
-        size_t root_u = find(u);
-        size_t root_v = find(v);
-
-        if (root_u != root_v) {
-            if (rank[root_u] > rank[root_v]) {
-                parent[root_v] = root_u;
-            } else if (rank[root_u] < rank[root_v]) {
-                parent[root_u] = root_v;
-            } else {
-                parent[root_v] = root_u;
-                ++rank[root_u];
-            }
-        }
-    }
-
-private:
-    std::vector<size_t> parent;
-    std::vector<size_t> rank;
-};
 
 
 #endif  // GRAPH_HPP
