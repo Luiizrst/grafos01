@@ -1,11 +1,11 @@
-#ifndef DISJOINT_SET_HPP
-#define DISJOINT_SET_HPP
+#ifndef CONJUNTO_SET_HPP
+#define CONJUNTO_SET_HPP
 
 #include <vector>
 
-class DisjointSet {
+class conjunto {
 public:
-    DisjointSet(size_t n) : parent(n), rank(n, 0) {
+    conjunto(size_t n) : parent(n), rank(n, 0) {
         for (size_t i = 0; i < n; ++i) {
             parent[i] = i;
         }
@@ -39,4 +39,4 @@ private:
     std::vector<size_t> rank;
 };
 
-#endif // DISJOINT_SET_HPP
+#endif // CONJUNTO_SET_HPP

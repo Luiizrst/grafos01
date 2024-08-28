@@ -1,3 +1,7 @@
+// Trabalho Teoria dos Grafos 01
+// Luiz Guilherme Almas Araujo    
+// Felipe da Costa Pinto Vilela
+
 #include "Graph.hpp"
 #include "defines.hpp"
 

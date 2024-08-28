@@ -65,7 +65,7 @@ private:
     void dfs_indirect(Node* node, std::unordered_set<int>& visited);
 
     // Conjunto de vértices de articulação
-    void dfs_articulation(
+    void dfs_articulacao(
         size_t node_id,
         size_t& time,
         std::unordered_map<size_t, size_t>& discovery_time,

@@ -287,42 +287,42 @@ std::unordered_set<int> Graph::transitivo_direto(size_t vertex_id)
 
 std::unordered_set<int> Graph::transitivo_indireto(size_t vertex_id)
 {
-    std::unordered_set<int> visited;
+    std::unordered_set<int> visitado;
     Node* start_node = find_node(vertex_id);
-    if (!start_node) return visited;
+    if (!start_node) return visitado;
 
     // Inicia a DFS a partir do nó inicial
-    dfs_indirect(start_node, visited);
+    dfs_indirect(start_node, visitado);
 
     // Remove o vértice de origem do conjunto de visitados, se estiver presente
-    visited.erase(vertex_id);
+    visitado.erase(vertex_id);
 
-    return visited;
+    return visitado;
 }
 
-void Graph::dfs_direcionado(Node* node, std::unordered_set<int>& visited)
+void Graph::dfs_direcionado(Node* node, std::unordered_set<int>& visitado)
 {
-    if (visited.find(node->_id) != visited.end()) return;
+    if (visitado.find(node->_id) != visitado.end()) return;
 
-    visited.insert(node->_id);
+    visitado.insert(node->_id);
     Edge* edge = node->_first_edge;
     while (edge) {
         Node* neighbor = find_node(edge->_target_id);
-        if (neighbor) dfs_direcionado(neighbor, visited);
+        if (neighbor) dfs_direcionado(neighbor, visitado);
         edge = edge->_next_edge;
     }
 }
 
-void Graph::dfs_indirect(Node* node, std::unordered_set<int>& visited)
+void Graph::dfs_indirect(Node* node, std::unordered_set<int>& visitado)
 {
-    if (!node || visited.count(node->_id)) return;
+    if (!node || visitado.count(node->_id)) return;
 
-    visited.insert(node->_id);
+    visitado.insert(node->_id);
 
     for (Edge* edge = node->_first_edge; edge; edge = edge->_next_edge) {
         Node* neighbor = find_node(edge->_target_id);
         if (neighbor) {
-            dfs_indirect(neighbor, visited);
+            dfs_indirect(neighbor, visitado);
         }
     }
 }
@@ -497,7 +497,7 @@ std::vector<Edge> Graph::kruskal_mst(std::unordered_set<size_t> subset) {
     });
 
     // Inicializa o Disjoint Set
-    DisjointSet ds(_number_of_nodes);
+    conjunto ds(_number_of_nodes);
 
     // Adiciona arestas ao MST usando o algoritmo de Kruskal
     for (const Edge& edge : edges) {
@@ -516,7 +516,7 @@ std::vector<Edge> Graph::kruskal_mst(std::unordered_set<size_t> subset) {
 
 //Raio, Diâmetro, Centro e Periferia do grafo
 std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>> Graph::calcula_raio_diametro_center_periferia() {
-    // Calcular distâncias mínimas entre todos os pares de vértices usando Floyd-Warshall
+    // Calcula as distâncias mínimas entre todos os pares de vértices usando Floyd
     std::unordered_map<size_t, std::unordered_map<size_t, float>> dist;
     std::unordered_map<size_t, std::unordered_map<size_t, size_t>> next;
 
@@ -578,22 +578,22 @@ std::tuple<float, float, std::unordered_set<size_t>, std::unordered_set<size_t>>
         }
     }
 
-    // Retornar os resultados
+    // Retorna os resultados
     return std::make_tuple(raio, diametro, centros, periferias);
 }
 
 //Conjunto de vertices de articulacao
-void Graph::dfs_articulation(
+void Graph::dfs_articulacao(
     size_t node_id,
-    size_t& time,
-    std::unordered_map<size_t, size_t>& discovery_time,
-    std::unordered_map<size_t, size_t>& low_time,
-    std::unordered_map<size_t, size_t>& parent,
-    std::unordered_set<size_t>& articulation_points,
-    std::unordered_set<size_t>& visited
+    size_t& tempo,
+    std::unordered_map<size_t, size_t>& descobre_tempo,
+    std::unordered_map<size_t, size_t>& menor_tempo,
+    std::unordered_map<size_t, size_t>& pai,
+    std::unordered_set<size_t>& pontos_articulacao,
+    std::unordered_set<size_t>& visitado
 ) {
-    discovery_time[node_id] = low_time[node_id] = ++time;
-    visited.insert(node_id);
+    descobre_tempo[node_id] = menor_tempo[node_id] = ++tempo;
+    visitado.insert(node_id);
     size_t children = 0;
 
     Node* node = find_node(node_id);
@@ -602,44 +602,44 @@ void Graph::dfs_articulation(
     for (Edge* edge = node->_first_edge; edge; edge = edge->_next_edge) {
         size_t neighbor_id = edge->_target_id;
 
-        if (discovery_time.find(neighbor_id) == discovery_time.end()) {
-            // If neighbor is not visited
-            parent[neighbor_id] = node_id;
+        if (descobre_tempo.find(neighbor_id) == descobre_tempo.end()) {
+            // Se o vizinho não for visitado
+            pai[neighbor_id] = node_id;
             ++children;
 
-            dfs_articulation(neighbor_id, time, discovery_time, low_time, parent, articulation_points, visited);
+            dfs_articulacao(neighbor_id, tempo, descobre_tempo, menor_tempo, pai, pontos_articulacao, visitado);
 
-            low_time[node_id] = std::min(low_time[node_id], low_time[neighbor_id]);
+            menor_tempo[node_id] = std::min(menor_tempo[node_id], menor_tempo[neighbor_id]);
 
-            if (parent[node_id] == 0 && children > 1) {
-                articulation_points.insert(node_id);
-            } else if (parent[node_id] != 0 && low_time[neighbor_id] >= discovery_time[node_id]) {
-                articulation_points.insert(node_id);
+            if (pai[node_id] == 0 && children > 1) {
+                pontos_articulacao.insert(node_id);
+            } else if (pai[node_id] != 0 && menor_tempo[neighbor_id] >= descobre_tempo[node_id]) {
+                pontos_articulacao.insert(node_id);
             }
-        } else if (neighbor_id != parent[node_id]) {
-            // Update low value of node
-            low_time[node_id] = std::min(low_time[node_id], discovery_time[neighbor_id]);
+        } else if (neighbor_id != pai[node_id]) {
+            // Atualizar valor baixo do nó
+            menor_tempo[node_id] = std::min(menor_tempo[node_id], descobre_tempo[neighbor_id]);
         }
     }
 }
 
 std::unordered_set<size_t> Graph::find_pontos_articulacao() {
-    std::unordered_set<size_t> articulation_points;
-    std::unordered_map<size_t, size_t> discovery_time;
-    std::unordered_map<size_t, size_t> low_time;
-    std::unordered_map<size_t, size_t> parent;
-    std::unordered_set<size_t> visited;
-    size_t time = 0;
+    std::unordered_set<size_t> pontos_articulacao;
+    std::unordered_map<size_t, size_t> descobre_tempo;
+    std::unordered_map<size_t, size_t> menor_tempo;
+    std::unordered_map<size_t, size_t> pai;
+    std::unordered_set<size_t> visitado;
+    size_t tempo = 0;
 
     Node* node = _first;
     while (node) {
-        if (discovery_time.find(node->_id) == discovery_time.end()) {
-            dfs_articulation(node->_id, time, discovery_time, low_time, parent, articulation_points, visited);
+        if (descobre_tempo.find(node->_id) == descobre_tempo.end()) {
+            dfs_articulacao(node->_id, tempo, descobre_tempo, menor_tempo, pai, pontos_articulacao, visitado);
         }
         node = node->_next_node;
     }
 
-    return articulation_points;
+    return pontos_articulacao;
 }
 
 
